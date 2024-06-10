@@ -11,10 +11,12 @@ const form = useForm({
     email: '',
     password: '',
     password_confirmation: '',
+    profile_picture: null,
 });
 
 const submit = () => {
     form.post(route('register'), {
+        forceFormData: true,
         onFinish: () => form.reset('password', 'password_confirmation'),
     });
 };
@@ -25,7 +27,26 @@ const submit = () => {
         <Head title="Register" />
 
         <form @submit.prevent="submit">
+
+            <!-- Section pour l'upload de l'image -->
             <div>
+                <InputLabel for="profile_picture" value="Profile picture" />
+
+                <TextInput
+                    id="profile_picture"
+                    type="file"
+                    class="mt-1 block w-full"
+                    required
+                    autofocus
+                    autocomplete="profile_picture"
+                    @input="form.profile_picture = $event.target.files[0]"
+                />
+
+                <InputError class="mt-2" :message="form.errors.profile_picture" />
+            </div>
+
+            <!-- Code de base breeze -->
+            <div class="mt-4">
                 <InputLabel for="name" value="Name" />
 
                 <TextInput

@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -29,13 +31,42 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        $user->fill($request->validated());
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+
+        $user->save();
+
+        return Redirect::route('profile.edit');
+    }
+
+    /**
+     * Update the user's profile picture.
+     */
+    public function updateProfilePicture(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'profile_picture' => ['image', 'required']
+        ]);
+
+        $user = $request->user();
+        if ($request->hasFile('profile_picture')) {
+            if ($user->profile_picture) {
+                Storage::delete($user->profile_picture);
+            }
+
+            $path = Storage::disk('public')->putFile('profile', $request->file('profile_picture'));
+
+            // Obtenir l'URL publique du fichier stocké
+            $url = Storage::url($path);
+            $user->profile_picture = $url;
+            $user->save();
+        }
 
         return Redirect::route('profile.edit');
     }
