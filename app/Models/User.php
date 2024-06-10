@@ -44,4 +44,16 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function send_messages(){
+        return $this->hasMany(Message::class, $foreignKey = 'sender_id');
+    }
+
+    public function received_messages(){
+        return $this->hasMany(Message::class, $foreignKey = 'receiver_id');
+    }
+
+    public function conversations(){
+        return $this->hasMany(Conversation::class, 'sender_id')->orWhere('receiver_id', $this->id);
+    }
 }
