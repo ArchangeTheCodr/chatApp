@@ -1,5 +1,6 @@
 <script setup>
     import { defineProps } from 'vue';
+    import { defineEmits } from 'vue';
 
     defineProps({
         users: {
@@ -7,11 +8,22 @@
             required: true
         }
     })
+
+    const emit = defineEmits(['userSelected'])
+
+    const showConversation = (id)  => {
+        emit('userSelected', id)
+    }
 </script>
 
 <template>
     <div class="flex flex-col gill">
-        <div class="list flex justify-around mx-20" v-for="user in users" :key="user.id">
+        <div 
+            @click.prevent="showConversation(user.id)"
+            class="list flex justify-around mx-20" 
+            v-for="user in users" 
+            :key="user.id" 
+        >
             <img 
                 :src="user.profile_picture" 
                 class="h-12 rounded-full max-w-full max-h-full mt-6"

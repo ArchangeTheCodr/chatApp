@@ -1,6 +1,8 @@
 <script setup>
     import { Head } from '@inertiajs/vue3';
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+    import { ref, watch } from 'vue'
+
     import UserList from'./partials/UserList.vue';
     import MessageZone from'./partials/MessageZone.vue';
 
@@ -11,28 +13,18 @@
         },
     })
 
-    const messages =[
-        {
-            sender: 1,
-            name: "lala",
-            text: "Hello Bro"
-        },
-        {
-            sender: 2,
-            name: "lolo",
-            text: "Hello. bien ou bien ??"
-        },
-        {
-            sender: 1,
-            name: "lala",
-            text: "Super. on se voit a 14h ?"
-        },
-        {
-            sender: 2,
-            name: "lolo",
-            text: "Ouaip. A toute babe !!!"
-        },
-    ];
+    //////Gestion de l'affichage des messages
+    const messages = ref([])
+    const selectedUser = ref(0);
+
+    const handleUserSelected = (id) => {
+        axios.get('/messages/'+ id)
+        .then((response) => {
+            messages.value = response.data.messages
+            selectedUser.value = id
+        })
+        .catch(error => console.log(error))
+    }
 </script>
 
 <template>
@@ -46,8 +38,17 @@
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 flex flex-col">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg flex justify-between">
-                    <UserList :users="users"/>
-                    <MessageZone :messages="messages"/>
+                    <UserList 
+                        :users="users"
+                        @userSelected="handleUserSelected"
+                    />
+                    <div v-if="messages">
+                        <MessageZone 
+                            :selectedUser="selectedUser"
+                            :messages="messages"
+                        />
+                    </div>
+                    <div v-else>Empty set</div>
                 </div>
             </div>
         </div>

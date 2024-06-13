@@ -2,13 +2,40 @@
     import TextInput from '@/Components/TextInput.vue';
     import PrimaryButton from '@/Components/PrimaryButton.vue';
 
+    import { router } from '@inertiajs/vue3';
+    import { useForm } from '@inertiajs/vue3';
+    import { computed } from 'vue'
+    import { usePage } from '@inertiajs/vue3'
+    import { watch } from 'vue';
 
-    defineProps({
-        messages:{
+   const props = defineProps({
+        messages: {
             type: Array,
-            required: true
-        }
+            required : true
+        },
+        selectedUser: {
+            type: Number,
+            required : true
+        },
     })
+
+    //Gestion de l'envoi du message
+    const page = usePage()
+    const sender = computed(() => page.props.auth.user)
+
+
+    const form = useForm({
+        sender_id: sender.id,
+        receiver_id: props.selectedUser,
+        text: '',
+    })
+
+
+
+    function sendMessage(){
+        console.log(sender)
+    }
+
 </script>
 
 <template>
@@ -17,7 +44,7 @@
             <div 
                 v-for="message in messages" 
                 :key="message.id"
-                :class="message.sender === 1 ? 
+                :class="message.sender_id === 1 ? 
                     'left msg flex flex-col mt-6 max-w-80 ' :
                     'right msg flex flex-col mt-6 max-w-80 '"
                 
@@ -29,10 +56,11 @@
 
         <div class="form">
             <div class="">
-                <form>
+                <form @submit.prevent="sendMessage">
                     <TextInput
                         type="text"
                         class="mt-1 block w-full"
+                        v-model="text"
                         required
                         autofocus
                     />
@@ -59,14 +87,14 @@
     }
 
     .left{
-        margin-left: 100px;
+        margin-left: 10px;
     }
     .right{
         margin-left: 500px;
     }
 
     #one{
-        border: 1px solid #a32187;
+        border: 1px solid #fd08c8;
         display: block;
     }
 </style>
