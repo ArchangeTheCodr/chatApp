@@ -19,6 +19,7 @@ Route::get('/', function () {
 Route::middleware('auth')->group(function () {
     Route::get('/chat', [ChatController::class, 'Index'])->name('chat.index');
     Route::get('/messages/{id}', [MessageController::class, 'show'])->name('message.show');
+    Route::post('/messages', [MessageController::class, 'store'])->name('message.store');
 });
 
 Route::get('/dashboard', function () {

@@ -2,11 +2,9 @@
     import TextInput from '@/Components/TextInput.vue';
     import PrimaryButton from '@/Components/PrimaryButton.vue';
 
-    import { router } from '@inertiajs/vue3';
-    import { useForm } from '@inertiajs/vue3';
-    import { computed } from 'vue'
+    import { router, useForm } from '@inertiajs/vue3';
+    import { computed, watch } from 'vue'
     import { usePage } from '@inertiajs/vue3'
-    import { watch } from 'vue';
 
    const props = defineProps({
         messages: {
@@ -23,17 +21,20 @@
     const page = usePage()
     const sender = computed(() => page.props.auth.user)
 
+    //Ecoute du changement du user selectionne
+    watch(() => props.selectedUser, (newSelectedUser) => {
+        form.receiver_id = newSelectedUser;
+    });
 
     const form = useForm({
-        sender_id: sender.id,
+        sender_id: sender.value.id,
         receiver_id: props.selectedUser,
         text: '',
     })
 
 
-
     function sendMessage(){
-        console.log(sender)
+        router.post('/messages', form)
     }
 
 </script>
@@ -60,10 +61,14 @@
                     <TextInput
                         type="text"
                         class="mt-1 block w-full"
-                        v-model="text"
+                        v-model="form.text"
                         required
                         autofocus
                     />
+                    <!-- <input type="hidden" 
+                        v-model="form.receiver_id"
+                        :value="props.selectedUser"
+                    />  -->
                     <PrimaryButton>Send</PrimaryButton>
                 </form>
             </div>

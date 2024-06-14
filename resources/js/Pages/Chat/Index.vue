@@ -1,6 +1,7 @@
 <script setup>
     import { Head } from '@inertiajs/vue3';
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+    import { defineEmits } from 'vue';
     import { ref, watch } from 'vue'
 
     import UserList from'./partials/UserList.vue';
@@ -14,14 +15,15 @@
     })
 
     //////Gestion de l'affichage des messages
+    // const emit = defineEmits(['get_receiver_id'])
     const messages = ref([])
-    const selectedUser = ref(0);
+    const selectedUser = ref(0 )
 
-    const handleUserSelected = (id) => {
+    function handleUserSelected(id){
+        selectedUser.value = id
         axios.get('/messages/'+ id)
         .then((response) => {
             messages.value = response.data.messages
-            selectedUser.value = id
         })
         .catch(error => console.log(error))
     }
@@ -44,7 +46,7 @@
                     />
                     <div v-if="messages">
                         <MessageZone 
-                            :selectedUser="selectedUser"
+                        :selectedUser="selectedUser"
                             :messages="messages"
                         />
                     </div>

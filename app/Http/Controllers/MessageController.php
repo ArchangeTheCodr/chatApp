@@ -30,4 +30,14 @@ class MessageController extends Controller
             'messages' => $messages,
         ];
     }
+
+    public function store(Request $request){
+        Message::create($request->validate([
+            'sender_id' => ['required'],
+            'receiver_id' => ['required'],
+            'text' => ['required', 'min:1']
+        ]));
+
+        return to_route('chat.index');
+    }
 }
